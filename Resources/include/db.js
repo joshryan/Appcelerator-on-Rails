@@ -21,7 +21,7 @@ var db = Titanium.Database.open("ti_store");
         var results = {};
 
         //Get TODOs from database
-        var resultSet = db.execute("SELECT * FROM schema_migrations");
+        var resultSet = db.execute("SELECT version FROM schema_migrations");
         while (resultSet.isValidRow()) {
             var row;
             for (var i = 0; i < resultSet.fieldCount(); i++) {
@@ -42,14 +42,15 @@ var db = Titanium.Database.open("ti_store");
         Ti.API.info(migration_dir);
         var files = migration_dir.getDirectoryListing();
         for (var i = 0; i < files.length; i++) {
-            var file = files[i];
+            if (files[i].indexOf('.', 0) != 0) {
+	        var file = files[i];
+    	        var version = file.split(".")[0];
 
-            var version = file.split(".")[0];
-
-            if (!migrations[version])
-            {
-                Ti.API.info("Running migration... " + version);
-                Ti.include("../db/migrations/"  + file);
+                if (!migrations[version])
+            	{
+ 	            Ti.API.info("Running migration... " + version);
+    	            Ti.include("../db/migrations/"  + file);
+	        }
             }
         }
     }
